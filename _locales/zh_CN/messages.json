@@ -1,0 +1,11 @@
+{
+  "extensionName": {
+    "message": "小濃縮 (Quick Summary)"
+  },
+  "extensionDescription": {
+    "message": "快速总结网页内容"
+  },
+  "summarizeButton": {
+    "message": "重新总结"
+  }
+}

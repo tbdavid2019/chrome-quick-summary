@@ -37,22 +37,39 @@ function initPopup() {
 
 //複製功能 markdwon格式
 function copyToClipboard() {
-  // 直接复制存储的 Markdown 内容
-  navigator.clipboard.writeText(originalMarkdown).then(() => {
-    console.log('Markdown copied to clipboard');
+  // 获取当前页面的 URL
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    const pageUrl = tabs[0].url; // 获取当前页面的 URL
 
-    // 改用一种更隐蔽的方式通知用户复制成功，例如更改按钮文本
-    const copyButton = document.getElementById('copyButton');
-    copyButton.textContent = "Copied!";
-    setTimeout(() => {
-      copyButton.textContent = "Copy";
-    }, 2000);
-  }).catch(err => {
-    console.error('Error copying markdown text: ', err);
-    alert('Failed to copy text. Please try again.');
+    // 从 Chrome storage 中获取保存的 markdown 内容
+    chrome.storage.local.get(['summary'], (result) => {
+      if (chrome.runtime.lastError) {
+        console.error('Error loading summary for copy:', chrome.runtime.lastError);
+        alert('Failed to copy text. Please try again.');
+        return;
+      }
+
+      let markdownToCopy = result.summary || ''; // 获取保存的 markdown 内容
+
+      // 在 Markdown 内容末尾附加当前页面的 URL
+      markdownToCopy += `\n\n---\n[Original Source](${pageUrl})`;
+
+      navigator.clipboard.writeText(markdownToCopy).then(() => {
+        console.log('Markdown copied to clipboard');
+
+        // 改用一种更隐蔽的方式通知用户复制成功，例如更改按钮文本
+        const copyButton = document.getElementById('copyButton');
+        copyButton.textContent = "Copied!";
+        setTimeout(() => {
+          copyButton.textContent = "Copy";
+        }, 2000);
+      }).catch(err => {
+        console.error('Error copying markdown text: ', err);
+        alert('Failed to copy text. Please try again.');
+      });
+    });
   });
 }
-
 // 复制功能 文字格式
 // function copyToClipboard() {
 //   const summaryDiv = document.getElementById('summary');

@@ -1,10 +1,12 @@
 let currentTabId;
 let isProcessing = false;
+let originalMarkdown = ''; // 用于存储原始的 Markdown 内容
 
 function initPopup() {
   console.log('Initializing popup');
   const languageSelect = document.getElementById('languageSelect');
   const summarizeButton = document.getElementById('summarizeButton');
+  const copyButton = document.getElementById('copyButton'); // 获取复制按钮
 
   chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
     if (chrome.runtime.lastError) {
@@ -28,7 +30,45 @@ function initPopup() {
   });
 
   summarizeButton.addEventListener('click', summarizeCurrentPage);
+
+  // 绑定复制按钮的点击事件
+  copyButton.addEventListener('click', copyToClipboard);
 }
+
+//複製功能 markdwon格式
+function copyToClipboard() {
+  // 直接复制存储的 Markdown 内容
+  navigator.clipboard.writeText(originalMarkdown).then(() => {
+    console.log('Markdown copied to clipboard');
+
+    // 改用一种更隐蔽的方式通知用户复制成功，例如更改按钮文本
+    const copyButton = document.getElementById('copyButton');
+    copyButton.textContent = "Copied!";
+    setTimeout(() => {
+      copyButton.textContent = "Copy";
+    }, 2000);
+  }).catch(err => {
+    console.error('Error copying markdown text: ', err);
+    alert('Failed to copy text. Please try again.');
+  });
+}
+
+// 复制功能 文字格式
+// function copyToClipboard() {
+//   const summaryDiv = document.getElementById('summary');
+//   const textToCopy = summaryDiv.innerText;
+
+//   navigator.clipboard.writeText(textToCopy).then(() => {
+//     console.log('Text copied to clipboard');
+//     // 改用一种更隐蔽的方式通知用户复制成功，例如更改按钮文本
+//     copyButton.textContent = "Copied!";
+//     setTimeout(() => {
+//       copyButton.textContent = "Copy";
+//     }, 2000);
+//   }).catch(err => {
+//     console.error('Error copying text: ', err);
+//   });
+// }
 
 // 启用总结按钮
 function enableSummarizeButton() {
@@ -262,18 +302,19 @@ async function generateSummary(content) {
   const summaryDiv = document.getElementById('summary');
   const summarizeButton = document.getElementById('summarizeButton');
   const language = languageSelect.value;
-  
+
   const targetLanguage = language === 'zh_TW' ? '繁體中文' : 'English';
   const bulletPointInstruction = language === 'zh_TW' ? '请使用项目符号列表。' : 'Please use bullet points.';
-  
+
+  // 准备要发送到 API 的提示词
   const prompt = `將以下内容總結為${targetLanguage}。无论原文是什么语言，请确保摘要使用${targetLanguage}。
-  將以下原文總結為五個部分：1.總結 (Overall Summary)。2.觀點 (Viewpoints)。3.摘要 (Abstract)： 創建6到10個帶有適當表情符號的重點摘要。4.關鍵字 (Key Words)。 5.一個讓十二歲青少年可以看得動懂的段落。請確保每個部分只生成一次，且內容不重複。確保生成的文字都是${targetLanguage}為主
+  將以下原文總結為五個部分：1.總結 (Overall Summary)。2.觀點 (Viewpoints)。3.摘要 (Abstract)： 創建6到10個帶有適當表情符號的重點摘要。4.關鍵字 (Key Words)。 5.一個讓十二歲青少年可以看得動懂的段落。請確保每個部分只生成一次，且內容不重複。確保生成的文字都是${targetLanguage}為主。
   ${bulletPointInstruction}
-  将输出格式化为 Markdown  。
+  将输出格式化为 Markdown 。
   原文内容：\n\n${content}`;
 
   try {
-    // 从 chrome.storage 获取 API 密钥
+    // 从 Chrome storage 获取 API 密钥
     const result = await chrome.storage.sync.get('groqApiKey');
     const apiKey = result.groqApiKey;
     const apiBaseURL = result.groqApiBaseURL || 'https://api.groq.com/openai/v1';
@@ -281,24 +322,24 @@ async function generateSummary(content) {
     if (!apiKey) {
       throw new Error(language === 'zh_TW' ? 'API 還沒設置。请在扩展选项中设置您的 Groq API 密钥。' : 'API key not set. Please set your Groq API key in the extension options.');
     }
+
+    // 发送请求到 API
     const response = await fetch(`${apiBaseURL}/chat/completions`, {
-// const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        //model: "mixtral-8x7b-32768",
-       model: "llama-3.1-70b-versatile",
+        model: "llama-3.1-70b-versatile",  // 使用的模型
         messages: [{
           role: "system",
-          content: `將以下原文總結為四個部分：總結 (Overall Summary)。觀點 (Viewpoints)。摘要 (Abstract)： 創建6到10個帶有適當表情符號的重點摘要。關鍵字 (Key Words)。請確保每個部分只生成一次，且內容不重複。確保生成的文字都是${targetLanguage}為主 .`
+          content: `將以下原文總結為五個部分：1.總結 (Overall Summary)。2.觀點 (Viewpoints)。3.摘要 (Abstract)： 創建6到10個帶有適當表情符號的重點摘要。4.關鍵字 (Key Words)。 5.一個讓十二歲青少年可以看得動懂的段落。請確保每個部分只生成一次，且內容不重複。確保生成的文字都是${targetLanguage}為主 .`
         }, {
           role: "user",
           content: prompt
         }],
-        stream: true
+        stream: true // 使用流式响应
       })
     });
 
@@ -310,27 +351,30 @@ async function generateSummary(content) {
     const decoder = new TextDecoder();
     let fullContent = '';
 
+    // 读取流式响应的数据
     while (true) {
-      const {value, done} = await reader.read();
+      const { value, done } = await reader.read();
       if (done) break;
-      
+
       const chunk = decoder.decode(value);
       const lines = chunk.split('\n');
-      
+
       for (const line of lines) {
         if (line.startsWith('data:')) {
           const data = line.slice(5).trim();
-          
+
           if (data === '[DONE]') {
             console.log('Stream ended');
             continue;
           }
-          
+
           try {
             const parsedData = JSON.parse(data);
             if (parsedData.choices && parsedData.choices[0].delta && parsedData.choices[0].delta.content) {
               fullContent += parsedData.choices[0].delta.content;
-              summaryDiv.innerHTML = marked.parse(fullContent); // 实时更新摘要内容
+
+              // 将生成的 Markdown 内容实时更新到页面上
+              summaryDiv.innerHTML = marked.parse(fullContent);
             }
           } catch (parseError) {
             console.error('Error parsing JSON:', parseError);
@@ -339,11 +383,13 @@ async function generateSummary(content) {
       }
     }
 
-    // 保存最终的摘要内容
-    saveState(language, summaryDiv.innerHTML);
+    // 保存最终的 Markdown 内容
+    originalMarkdown = fullContent;
+    saveState(language, originalMarkdown);
+
   } catch (error) {
     console.error('Error generating summary:', error);
-    summaryDiv.innerHTML = language === 'zh_TW' 
+    summaryDiv.innerHTML = language === 'zh_TW'
       ? `生成摘要时出错：${error.message}。請檢查設定中的密鑰並重試`
       : `Error generating summary: ${error.message}. Please check your API key in the extension options and try again.`;
   } finally {

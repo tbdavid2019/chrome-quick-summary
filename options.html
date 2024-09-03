@@ -2,16 +2,62 @@
 <html>
 <head>
   <title>Quick Page Summary Options</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .option-container {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: inline-block;
+      width: 150px;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 300px;
+      padding: 5px;
+    }
+
+    button {
+      padding: 5px 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #status {
+      margin-top: 10px;
+      color: green;
+    }
+  </style>
 </head>
 <body>
   <h1>Quick Page Summary Options</h1>
   
-  <label for="apiKey">Groq API Key:</label>
-  <input type="text" id="apiKey" />
-  
-  <label for="apiBaseURL">Groq API Base URL:</label>
-  <input type="text" id="apiBaseURL" placeholder="https://api.groq.com/openai/v1" />
-  
+  <div class="option-container">
+    <label for="apiKey">LLM API Key:</label>
+    <input type="text" id="apiKey" />
+  </div>
+
+  <div class="option-container">
+    <label for="apiBaseURL">LLM API Base URL:</label>
+    <input type="text" id="apiBaseURL" placeholder="https://api.groq.com/openai/v1" />
+  </div>
+
+  <div class="option-container">
+    <label for="modelName">Model Name:</label>
+    <input type="text" id="modelName" placeholder="llama-3.1-70b-versatile" />
+  </div>
+
   <button id="save">Save</button>
   <div id="status"></div>
   

@@ -331,11 +331,12 @@ async function generateSummary(content) {
   原文内容：\n\n${content}`;
 
   try {
-    // 从 Chrome storage 获取 API 密钥和模型名称
-    const result = await chrome.storage.sync.get(['groqApiKey', 'groqApiBaseURL', 'groqModelName']);
+    // 从 Chrome storage 获取 API 密钥
+    const result = await chrome.storage.sync.get(['groqApiKey', 'groqApiBaseURL', 'modelName']);
+    //const result = await chrome.storage.sync.get('groqApiKey');
     const apiKey = result.groqApiKey;
     const apiBaseURL = result.groqApiBaseURL || 'https://api.groq.com/openai/v1';
-    const modelName = result.groqModelName || 'llama-3.1-70b-versatile';
+    const modelName = result.modelName || 'llama-3.1-70b-versatile';
 
     if (!apiKey) {
       throw new Error(language === 'zh_TW' ? 'API 還沒設置。请在扩展选项中设置您的 Groq API 密钥。' : 'API key not set. Please set your Groq API key in the extension options.');
@@ -349,7 +350,7 @@ async function generateSummary(content) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: modelName,  // 使用参数化的模型名称
+        model: "llama-3.1-70b-versatile",  // 使用的模型
         messages: [{
           role: "system",
           content: `將以下原文總結為五個部分：1.總結 (Overall Summary)。2.觀點 (Viewpoints)。3.摘要 (Abstract)： 創建6到10個帶有適當表情符號的重點摘要。4.關鍵字 (Key Words)。 5.一個讓十二歲青少年可以看得動懂的段落。請確保每個部分只生成一次，且內容不重複。確保生成的文字都是${targetLanguage}為主 .`

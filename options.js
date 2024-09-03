@@ -2,10 +2,12 @@
 function save_options() {
   var apiKey = document.getElementById('apiKey').value;
   var apiBaseURL = document.getElementById('apiBaseURL').value;
+  var modelName = document.getElementById('modelName').value;
   
   chrome.storage.sync.set({
     groqApiKey: apiKey,
-    groqApiBaseURL: apiBaseURL
+    groqApiBaseURL: apiBaseURL,
+    groqModelName: modelName
   }, function() {
     // Update status to let user know options were saved.
     var status = document.getElementById('status');
@@ -21,10 +23,12 @@ function save_options() {
 function restore_options() {
   chrome.storage.sync.get({
     groqApiKey: '',
-    groqApiBaseURL: 'https://api.groq.com/openai/v1'
+    groqApiBaseURL: 'https://api.groq.com/openai/v1',
+    groqModelName: 'llama-3.1-70b-versatile'
   }, function(items) {
     document.getElementById('apiKey').value = items.groqApiKey;
     document.getElementById('apiBaseURL').value = items.groqApiBaseURL;
+    document.getElementById('modelName').value = items.groqModelName;
   });
 }
 

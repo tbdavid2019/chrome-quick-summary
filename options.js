@@ -9,7 +9,6 @@ function save_options() {
     groqApiBaseURL: apiBaseURL,
     groqModelName: modelName
   }, function() {
-    // Update status to let user know options were saved.
     var status = document.getElementById('status');
     status.textContent = 'Options saved.';
     setTimeout(function() {
@@ -24,11 +23,47 @@ function restore_options() {
   chrome.storage.sync.get({
     groqApiKey: '',
     groqApiBaseURL: 'https://api.groq.com/openai/v1',
-    groqModelName: 'llama-3.1-70b-versatile'
+    groqModelName: ''
   }, function(items) {
     document.getElementById('apiKey').value = items.groqApiKey;
     document.getElementById('apiBaseURL').value = items.groqApiBaseURL;
-    document.getElementById('modelName').value = items.groqModelName;
+    fetchAndPopulateModels(items.groqApiKey, items.groqApiBaseURL, items.groqModelName);
+  });
+}
+
+// Fetch available models from the OpenAI API and populate the dropdown
+function fetchAndPopulateModels(apiKey, apiBaseURL, selectedModel) {
+  const modelSelect = document.getElementById('modelName');
+  
+  if (!apiKey) {
+    modelSelect.innerHTML = '<option value="">Please set your API key</option>';
+    return;
+  }
+  
+  fetch(`${apiBaseURL}/models`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    modelSelect.innerHTML = '';
+    const models = data.data || [];
+    models.forEach(model => {
+      const option = document.createElement('option');
+      option.value = model.id;
+      option.textContent = model.id;
+      if (model.id === selectedModel) {
+        option.selected = true;
+      }
+      modelSelect.appendChild(option);
+    });
+  })
+  .catch(error => {
+    console.error('Error fetching models:', error);
+    modelSelect.innerHTML = '<option value="">Failed to load models</option>';
   });
 }
 

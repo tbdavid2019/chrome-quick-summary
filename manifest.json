@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "__MSG_extensionName__",
-  "version": "1.2",
-  "description": "__MSG_extensionDescription__",
+  "name": "小濃縮 (Quick Summary)",
+  "version": "1.4",
+  "description": "快速濃縮網頁內容,Youtube內容 (支援Groq/Chatgpt/Ollama等API大型語言模型 自由切換)",
   "default_locale": "zh_TW",
   "action": {
     "default_popup": "popup.html",
@@ -28,7 +28,6 @@
     }
   ],
   "host_permissions": [
-    "https://*.groq.com/*",
     "<all_urls>"
   ],
   "options_page": "options.html"

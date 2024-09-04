@@ -29,8 +29,11 @@
 
 ## 設置選項
 
-- **API 密鑰**：在設置頁面輸入你的 groq API 密鑰，以便訪問 API。
+- **API 密鑰**：在設置頁面輸入你的 groq / openai / azure ai 等 API 密鑰，以便訪問 API。
 - **API Base URL**：可選，設置 API 的 Base URL，默認為 `https://api.groq.com/`。
+- **模型選擇** (選擇模型): 選擇你想使用的模型（只要密鑰和BASE ULR正確設置，系統會載入可用的模型 ）
+
+![alt text](image.png)
 
 ## 貢獻
 

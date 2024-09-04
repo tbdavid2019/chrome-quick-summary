@@ -2,6 +2,8 @@
 
 小濃縮是一款 Chrome 擴展程序，使用 groq API 來快速總結網頁內容。該擴展程序旨在幫助用戶更高效地瀏覽和處理信息，提供簡潔、準確的內容摘要。
 
+[![小濃縮](https://img.youtube.com/vi/3HLD1YjOtGk/0.jpg)](https://www.youtube.com/watch?v=3HLD1YjOtGk)
+
 ## 功能
 
 - **網頁內容總結**：通過 groq API 自動生成網頁內容的摘要。

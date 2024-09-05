@@ -34,7 +34,12 @@ body {
   border: 1px solid #ddd;
   padding: 10px;
   margin-top: 10px;
+  font-size: 14px;
+  word-wrap: break-word; /* 强制在单词之间换行 */
+  word-break: break-word; /* 如果单词太长，强制在单词内部断行 */
+  white-space: normal; /* 确保空白字符的处理正常 */
 }
+
 #copyButton {
   float: right;
   padding: 5px 10px;

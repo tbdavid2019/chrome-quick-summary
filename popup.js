@@ -99,23 +99,24 @@ function loadSavedState() {
   chrome.storage.local.get(['language', 'summary'], (result) => {
     if (chrome.runtime.lastError) {
       console.error('Error loading saved state:', chrome.runtime.lastError);
-      handleError('Failed to load saved state. Please try again.');
       return;
     }
     console.log('Loaded state:', result);
     const languageSelect = document.getElementById('languageSelect');
     const summaryDiv = document.getElementById('summary');
+    const summarizeButton = document.getElementById('summarizeButton');
 
     if (result.language) {
       languageSelect.value = result.language;
+      updateButtonText();
     }
     if (result.summary) {
-      summaryDiv.innerHTML = result.summary;
-      summaryDiv.innerHTML = marked.parse(result.summary); // Convert Markdown to HTML
+      // 將保存的 Markdown 重新渲染為 HTML
+      summaryDiv.innerHTML = marked.parse(result.summary);
+      summarizeButton.disabled = false;
     } else {
       updateInitialMessage();
     }
-    updateButtonText();
   });
 }
 
@@ -222,7 +223,8 @@ function loadSavedState() {
       updateButtonText();
     }
     if (result.summary) {
-      summaryDiv.innerHTML = result.summary;
+      // 將保存的 Markdown 重新渲染為 HTML
+      summaryDiv.innerHTML = marked.parse(result.summary);
       summarizeButton.disabled = false;
     } else {
       updateInitialMessage();
@@ -233,7 +235,7 @@ function loadSavedState() {
 // 保存状态
 function saveState(language, summary) {
   console.log('Saving state:', { language, summary });
-  chrome.storage.local.set({language, summary}, () => {
+  chrome.storage.local.set({ language, summary }, () => {
     if (chrome.runtime.lastError) {
       console.error('Error saving state:', chrome.runtime.lastError);
     } else {
@@ -241,6 +243,7 @@ function saveState(language, summary) {
     }
   });
 }
+
 
 // 更新初始消息
 function updateInitialMessage() {

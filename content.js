@@ -1,4 +1,5 @@
 console.log('Content script loaded at:', new Date().toISOString());
+window.__contentScriptInjected = true;
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('Message received in content script:', request);
@@ -22,6 +23,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                         console.error('Error fetching captions:', error);
                         sendResponse({ content: '' });
                     });
+                return true; // 保持消息通道開放
             } else {
                 console.error('Video ID not found');
                 sendResponse({ content: '' });
@@ -33,7 +35,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             sendResponse({ content: content });
         }
     }
-    return true;  // 保持消息通道开放，以支持异步响应
+    return true; // 保持消息通道開放，以支持異步響應
 });
 
 function isYouTubeUrl(url) {

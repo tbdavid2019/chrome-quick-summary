@@ -1,5 +1,13 @@
-let currentTabId;
-let isProcessing = false;
+if (typeof isProcessing === 'undefined') {
+  let isProcessing = false;
+}
+
+
+
+if (typeof currentTabId === 'undefined') {
+  let currentTabId;
+}
+
 let originalMarkdown = ''; // 用于存储原始的 Markdown 内容
 
 function initPopup() {
@@ -70,22 +78,7 @@ function copyToClipboard() {
     });
   });
 }
-// 复制功能 文字格式
-// function copyToClipboard() {
-//   const summaryDiv = document.getElementById('summary');
-//   const textToCopy = summaryDiv.innerText;
 
-//   navigator.clipboard.writeText(textToCopy).then(() => {
-//     console.log('Text copied to clipboard');
-//     // 改用一种更隐蔽的方式通知用户复制成功，例如更改按钮文本
-//     copyButton.textContent = "Copied!";
-//     setTimeout(() => {
-//       copyButton.textContent = "Copy";
-//     }, 2000);
-//   }).catch(err => {
-//     console.error('Error copying text: ', err);
-//   });
-// }
 
 // 启用总结按钮
 function enableSummarizeButton() {

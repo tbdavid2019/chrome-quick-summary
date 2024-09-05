@@ -1,9 +1,15 @@
 {
   "manifest_version": 3,
   "name": "小濃縮 (Quick Summary)",
-  "version": "1.4",
+  "version": "1.5",
   "description": "快速濃縮網頁內容,Youtube內容 (支援Groq/Chatgpt/Ollama等API大型語言模型 自由切換)",
   "default_locale": "zh_TW",
+  "icons": {
+    "16": "16.png",
+    "32": "32.png",
+    "48": "48.png",
+    "128": "128.png"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -16,17 +22,13 @@
   "permissions": [
     "activeTab",
     "storage",
-    "scripting"
+    "scripting",
+    "tabs"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"]
-    }
-  ],
   "host_permissions": [
     "<all_urls>"
   ],

@@ -1,14 +1,16 @@
-if (typeof isProcessing === 'undefined') {
-  let isProcessing = false;
-}
 
+let isProcessing = false;
 
 
 if (typeof currentTabId === 'undefined') {
   let currentTabId;
 }
 
-let originalMarkdown = ''; // 用于存储原始的 Markdown 内容
+if (typeof originalMarkdown === 'undefined') {
+let originalMarkdown = '';   // 用于存储原始的 Markdown 内容
+}
+
+
 
 function initPopup() {
   console.log('Initializing popup');
